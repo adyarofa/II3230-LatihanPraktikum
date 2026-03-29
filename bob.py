@@ -92,6 +92,6 @@ else:
 # 6. Kesimpulan
 print("KESIMPULAN")
 print(f"Pesan berhasil didekripsi   : Ya")
-print(f"Integritas pesan terjaga    : {'Ya' if hash_local == hash_from_signature_str else 'Tidak ❌'}")
-print(f"Pengirim terverifikasi      : {'Ya' if hash_local == hash_from_signature_str else 'Tidak ❌'}")
+print(f"Integritas pesan terjaga    : {'Ya' if hash_local == hash_from_signature_str else 'Tidak'}")
+print(f"Pengirim terverifikasi      : {'Ya' if hash_local == hash_from_signature_str else 'Tidak'}")
 print(f"Plaintext                   : {plaintext_str}")
