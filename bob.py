@@ -49,7 +49,6 @@ print(f"Destination IP:          {payload['destination_ip']}")
 print(f"Hash Algorithm:          {payload['hash_algorithm']}")
 print(f"Symmetric Algorithm:     {payload['symmetric_algorithm']}")
 print(f"Asymmetric Algorithm:    {payload['asymmetric_algorithm']}")
-print(f"Hash:                    {payload['hash']}")
 
 # Decode semua hex values ke bytes
 encrypted_symmetric_key = bytes.fromhex(payload["encrypted_symmetric_key"])
