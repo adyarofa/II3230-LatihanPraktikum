@@ -11,9 +11,10 @@ text = input("Masukkan pesan yang ingin kamu kirim: ")
 ip_tujuan = input("Masukkan IP Address penerima (harus berada di jaringan yang sama): ")
 port = 65432
 
-source = urlopen('http://checkip.dyndns.com')
-data = str(source.read())
-ip_asal = re.search(r"\d+\.\d+\.\d+\.\d+", data).group()
+# source = urlopen('http://checkip.dyndns.com')
+# data = str(source.read())
+hostname = socket.gethostname()
+ip_asal = socket.gethostbyname(hostname)
 
 key = get_random_bytes(16)
 symmetrical = AES.new(key, AES.MODE_EAX)
@@ -43,6 +44,7 @@ payload = {
     "cipher_text": cipher_text.hex(),
     "tag": tag.hex(),
     "nonce": nonce.hex(),
+    "hash": hash_object.hexdigest(),
     "signature": sign.hex(),
     "hash_algorithm": "SHA256",
     "symmetric_algorithm": "AES256",
