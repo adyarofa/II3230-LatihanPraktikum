@@ -77,6 +77,13 @@ print("Status: Ciphertext berhasil didekripsi")
 print("\nVerifikasi Hash")
 hash_local = SHA256.new(plaintext_str.encode("utf-8")).hexdigest()
 print(f"Hash lokal (dihitung ulang): {hash_local}")
+print(f"Hash dari payload:          {payload['hash']}")
+
+hash_match = hash_local == payload['hash']
+if hash_match:
+    print("Status: Hash MATCH - Integritas pesan terjaga")
+else:
+    print("Status: Hash MISMATCH - Pesan mungkin telah dimodifikasi!")
 
 # 5. Verifikasi Digital Signature (pkcs1_15 verify pakai public key Alice)
 print("\nVerifikasi Digital Signature")
@@ -94,5 +101,6 @@ with open("public_key_alice.pem", "rb") as f:
 # 6. Kesimpulan
 print("\nKESIMPULAN")
 print(f"Pesan berhasil didekripsi   : Ya")
+print(f"Integritas pesan terjaga    : {'Ya' if hash_match else 'Tidak'}")
 print(f"Pengirim terverifikasi      : {'Ya' if sig_valid else 'Tidak'}")
 print(f"Plaintext                   : {plaintext_str}")
