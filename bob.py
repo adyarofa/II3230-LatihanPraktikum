@@ -2,6 +2,7 @@ import socket
 import ast
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.PublicKey import RSA
+from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 
 # Langkah-langkah:
@@ -9,7 +10,7 @@ from Crypto.Hash import SHA256
 # 2. Dekripsi symmetric key (RSA-OAEP)
 # 3. Dekripsi ciphertext (AES-EAX)
 # 4. Verifikasi hash (SHA-256)
-# 5. Verifikasi digital signature (RSA-OAEP)
+# 5. Verifikasi digital signature (pkcs1_15)
 
 HOST = "0.0.0.0"  
 PORT = 65432
@@ -48,6 +49,7 @@ print(f"Destination IP:          {payload['destination_ip']}")
 print(f"Hash Algorithm:          {payload['hash_algorithm']}")
 print(f"Symmetric Algorithm:     {payload['symmetric_algorithm']}")
 print(f"Asymmetric Algorithm:    {payload['asymmetric_algorithm']}")
+print(f"Hash:                    {payload['hash']}")
 
 # Decode semua hex values ke bytes
 encrypted_symmetric_key = bytes.fromhex(payload["encrypted_symmetric_key"])
@@ -76,27 +78,30 @@ print("Status: Ciphertext berhasil didekripsi")
 print("\nVerifikasi Hash")
 hash_local = SHA256.new(plaintext_str.encode("utf-8")).hexdigest()
 print(f"Hash lokal (dihitung ulang): {hash_local}")
+print(f"Hash dari payload:          {payload['hash']}")
 
-# 5. Verifikasi Digital Signature (RSA-OAEP decrypt signature pakai public key Alice)
+hash_match = hash_local == payload['hash']
+if hash_match:
+    print("Status: Hash MATCH - Integritas pesan terjaga")
+else:
+    print("Status: Hash MISMATCH - Pesan mungkin telah dimodifikasi!")
+
+# 5. Verifikasi Digital Signature (pkcs1_15 verify pakai public key Alice)
 print("\nVerifikasi Digital Signature")
 with open("public_key_alice.pem", "rb") as f:
     public_key_alice = RSA.import_key(f.read())
-    hash_from_signature = PKCS1_OAEP.new(public_key_alice).decrypt(signature)
-    hash_from_signature_str = hash_from_signature.decode("utf-8")
-    print(f"Hash dari signature:        {hash_from_signature_str}")
-
-# Bandingkan hash lokal dengan hash dari signature
-if hash_local == hash_from_signature_str:
-    print("\nHash MATCH")
-    print("Integritas pesan terjaga, pesan tidak berubah selama transmisi.")
-    print("Signature valid, pesan benar berasal dari Alice.")
-else:
-    print("\nHash MISMATCH")
-    print("PERINGATAN: Pesan mungkin telah dimodifikasi atau pengirim tidak valid!")
+    hash_obj = SHA256.new(plaintext_str.encode("utf-8"))
+    try:
+        pkcs1_15.new(public_key_alice).verify(hash_obj, signature)
+        sig_valid = True
+        print("Status: Signature VALID - Pesan benar berasal dari Alice")
+    except (ValueError, TypeError):
+        sig_valid = False
+        print("Status: Signature INVALID - Pengirim tidak terverifikasi!")
 
 # 6. Kesimpulan
-print("KESIMPULAN")
+print("\nKESIMPULAN")
 print(f"Pesan berhasil didekripsi   : Ya")
-print(f"Integritas pesan terjaga    : {'Ya' if hash_local == hash_from_signature_str else 'Tidak'}")
-print(f"Pengirim terverifikasi      : {'Ya' if hash_local == hash_from_signature_str else 'Tidak'}")
+print(f"Integritas pesan terjaga    : {'Ya' if hash_match else 'Tidak'}")
+print(f"Pengirim terverifikasi      : {'Ya' if sig_valid else 'Tidak'}")
 print(f"Plaintext                   : {plaintext_str}")
