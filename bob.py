@@ -77,7 +77,6 @@ print("Status: Ciphertext berhasil didekripsi")
 print("\nVerifikasi Hash")
 hash_local = SHA256.new(plaintext_str.encode("utf-8")).hexdigest()
 print(f"Hash lokal (dihitung ulang): {hash_local}")
-print(f"Hash dari payload:          {payload['hash']}")
 
 hash_match = hash_local == payload['hash']
 if hash_match:
