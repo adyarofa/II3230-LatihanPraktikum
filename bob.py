@@ -43,6 +43,11 @@ print(f"Cipher Text:             {payload['cipher_text'][:40]}...")
 print(f"Tag:                     {payload['tag']}")
 print(f"Nonce:                   {payload['nonce']}")
 print(f"Signature:               {payload['signature'][:40]}...")
+print(f"Source IP:               {payload['source_ip']}")
+print(f"Destination IP:          {payload['destination_ip']}")
+print(f"Hash Algorithm:          {payload['hash_algorithm']}")
+print(f"Symmetric Algorithm:     {payload['symmetric_algorithm']}")
+print(f"Asymmetric Algorithm:    {payload['asymmetric_algorithm']}")
 
 # Decode semua hex values ke bytes
 encrypted_symmetric_key = bytes.fromhex(payload["encrypted_symmetric_key"])
